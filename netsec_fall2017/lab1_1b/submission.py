@@ -1,7 +1,7 @@
 from playground.network.packet import PacketType
 from playground.network.packet.fieldtypes import STRING, BUFFER
 
-class RequestWriteMessage(PacketType):
+class RequestWriteMessage(PacketType):                  ##Packet1: Client requesting the server to send the message
     DEFINITION_IDENTIFIER = "jchaha1_lab2b1.packet"
     DEFINITION_VERSION = "1.0"
     FIELDS = [
@@ -9,12 +9,12 @@ class RequestWriteMessage(PacketType):
         ]
 
 packet1 = RequestWriteMessage()
-packet1.clientID = "jchahal_s"
-packet1Bytes = packet1.__serialize__()
+packet1.clientID = "jchahal_s"                          ##Initializing the fields
+packet1Bytes = packet1.__serialize__()                  ##Serialized packet bytes
 packet1_dslzd = RequestWriteMessage.Deserialize(packet1Bytes)
 
 
-class RequestReceiverInfo(PacketType):
+class RequestReceiverInfo(PacketType):                  ##Packet2: Server requesting the client to send the info for the messaeg
     DEFINITION_IDENTIFIER = "jchaha1_lab2b2.packet"
     DEFINITION_VERSION = "1.0"
 
@@ -24,7 +24,7 @@ packet2 = RequestReceiverInfo()
 packet2Bytes = packet2.__serialize__()
 packet2_dslzd = RequestReceiverInfo.Deserialize(packet2Bytes)
     
-class SendReceiverInfo(PacketType):
+class SendReceiverInfo(PacketType):                     ##Packet3: Client sending the receiver's ID and the message to the server
     DEFINITION_IDENTIFIER = "jchaha1_lab2b3.packet"
     DEFINITION_VERSION = "1.0"
 
@@ -40,7 +40,7 @@ packet3Bytes = packet3.__serialize__()
 packet3_dslzd = SendReceiverInfo.Deserialize(packet3Bytes)
 
 
-class MessageSent(PacketType):
+class MessageSent(PacketType):                          ##Server sending the acknowledgment of sending the message along with the time of delivery
     DEFINITION_IDENTIFIER = "jchaha1_lab2b4.packet"
     DEFINITION_VERSION = "1.0"
 
@@ -64,8 +64,8 @@ def basicUnitTest():
     print(packet1_dslzd)
     print("packetLength:")
     print(len(packet1Bytes))
-    assert packet1 == packet1_dslzd
-    assert packet1.clientID == packet1_dslzd.clientID
+    assert packet1 == packet1_dslzd                     ##Testing the equality of the packet
+    assert packet1.clientID == packet1_dslzd.clientID   ##Testing the equality of the values of the fields
     print("Assertion complete")
     
     print("\nPacket2 Bytes:")
@@ -99,7 +99,7 @@ def basicUnitTest():
     print("Assertion complete")
 
     print("\nChecking the equality of different packets: packet1 and packet3 after deserializing")
-    if packet1_dslzd == packet3_dslzd:
+    if packet1_dslzd == packet3_dslzd:                  ##Testing the equality of two different packets
         print("They are equal")
     else:
         print("They are not equal")
@@ -112,7 +112,7 @@ def basicUnitTest():
 
     print("\n")
 
-    deserializer = PacketType.Deserializer()
+    deserializer = PacketType.Deserializer()            ##Deserializing the packets chunck by chunck and keeping a note when a whole packet has been deserialized
     print("Starting with {} byets of data".format(len(packetBytes)))
     while len(packetBytes)>0:
         chunk, packetBytes = packetBytes[:10], packetBytes[10:]
