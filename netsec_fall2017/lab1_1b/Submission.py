@@ -64,7 +64,9 @@ def basicUnitTest():
     print(packet1_dslzd)
     print("packetLength:")
     print(len(packet1Bytes))
-    assert packet1 == packet1_dslzd   
+    assert packet1 == packet1_dslzd
+    assert packet1.clientID == packet1_dslzd.clientID
+    print("Assertion complete")
     
     print("\nPacket2 Bytes:")
     print(packet2Bytes)
@@ -72,7 +74,8 @@ def basicUnitTest():
     print(packet2_dslzd)
     print("packetLength:")
     print(len(packet2Bytes))
-    assert packet2 == packet2_dslzd   
+    assert packet2 == packet2_dslzd
+    print("Assertion complete")
 
     print("\nPacket3 Bytes:")
     print(packet3Bytes)
@@ -81,6 +84,9 @@ def basicUnitTest():
     print("packetLength:")
     print(len(packet3Bytes))
     assert packet3 == packet3_dslzd
+    assert packet3_dslzd.receiverID == "jchahal_r"
+    assert packet3_dslzd.message == b"Test Message."
+    print("Assertion complete")
 
     print("\nPacket4 Bytes:")
     print(packet4Bytes)
@@ -89,6 +95,14 @@ def basicUnitTest():
     print("packetLength:")
     print(len(packet4Bytes))
     assert packet4 == packet4_dslzd
+    assert packet4.messageSentTime == packet4_dslzd.messageSentTime
+    print("Assertion complete")
+
+    print("\nChecking the equality of different packets: packet1 and packet3 after deserializing")
+    if packet1_dslzd == packet3_dslzd:
+        print("They are equal")
+    else:
+        print("They are not equal")
 
     packetBytes = packet1Bytes + packet2Bytes + packet3Bytes + packet4Bytes
     print("\nTotal packetBytes")
