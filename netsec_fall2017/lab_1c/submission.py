@@ -58,7 +58,8 @@ class MessagingClientProtocol(Protocol):
                 respondPacket.receiverID = "jchahal_R"
                 respondPacket.message = b"This is a test Message"
             elif isinstance(pckt, MessageSent):
-                print("Got Packet 4")
+                print("Got Packet 4\n")
+                self.connection_lost()
                 return
 
             self.transport.write(respondPacket.__serialize__())
@@ -67,8 +68,8 @@ class MessagingClientProtocol(Protocol):
         initialPacket = RequestWriteMessage(clientID = "jchahal1_S")
         self.transport.write(initialPacket.__serialize__())
         
-    def connection_lost(self, exc):
-        print("Echo Server Connection Lost because {}".format(exc))
+    def connection_lost(self, reason=None):
+        print("Comminication Ended\n")
 
 class MessagingServerProtocol (Protocol):
     def __init__(self):
@@ -94,8 +95,8 @@ class MessagingServerProtocol (Protocol):
 
             self.transport.write(respondPacket.__serialize__())
 
-    def connection_lost(self, exc):
-        print("Echo Server Connection Lost because {}".format(exc))
+    def connection_lost(self, reason=None):
+        print("Comminication Ended")
 
 def Test():
     client = MessagingClientProtocol()
