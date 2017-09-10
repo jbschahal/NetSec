@@ -1,3 +1,7 @@
+"""
+THIS ASSIGNMENT IS NOT READY FOR EVALUATION YET
+"""
+
 from playground.network.packet import PacketType
 from playground.network.packet.fieldtypes import STRING, BUFFER
 from playground.network.testing import mock
