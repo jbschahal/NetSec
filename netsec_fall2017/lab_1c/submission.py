@@ -8,6 +8,7 @@ from playground.network.testing import mock
 from playground.asyncio_lib.testing import TestLoopEx
 from asyncio import Protocol
 import asyncio
+import datetime
 
 class RequestWriteMessage(PacketType):                  ##Packet1: Client requesting the server to send the message
     DEFINITION_IDENTIFIER = "lab1.packet1"
@@ -54,11 +55,13 @@ class MessagingClientProtocol(Protocol):
             print(pckt)
             if isinstance(pckt, RequestReceiverInfo):
                 print("Got packet 2")
+                print("Packet Details: Only request was transfered for this packet\n")
                 respondPacket = SendReceiverInfo()
                 respondPacket.receiverID = "jchahal_R"
                 respondPacket.message = b"This is a test Message"
             elif isinstance(pckt, MessageSent):
-                print("Got Packet 4\n")
+                print("Got Packet 4")
+                print("Packet Details: MessageSentTime: " + pckt.messageSentTime + "\n")
                 self.connection_lost()
                 return
 
@@ -87,18 +90,21 @@ class MessagingServerProtocol (Protocol):
             print(pckt)
             if isinstance(pckt, RequestWriteMessage):
                 print("Got Packet 1")
+                print("Packet Details: ClientID: " + pckt.clientID +"\n")
                 respondPacket = RequestReceiverInfo()
             elif isinstance(pckt, SendReceiverInfo):
                 print("Got Packet 3")
+                print("Packet Details: ReceiverID: " + pckt.receiverID)
+                print("Message" + str(pckt.message) +"\n")
                 respondPacket = MessageSent()
-                respondPacket.messageSentTime = "Right Now"
+                respondPacket.messageSentTime = str(datetime.datetime.now())
 
             self.transport.write(respondPacket.__serialize__())
 
     def connection_lost(self, reason=None):
         print("Comminication Ended")
 
-def Test():
+def BasicUnitTest():
     client = MessagingClientProtocol()
     server = MessagingServerProtocol()
     
@@ -112,4 +118,4 @@ def Test():
     
     
 if __name__ == "__main__":
-    Test()
+    BasicUnitTest()
