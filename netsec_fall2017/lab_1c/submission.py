@@ -1,7 +1,3 @@
-"""
-THIS ASSIGNMENT IS NOT READY FOR EVALUATION YET
-"""
-
 from playground.network.packet import PacketType
 from playground.network.packet.fieldtypes import STRING, BUFFER
 from playground.network.testing import mock
@@ -47,7 +43,7 @@ class MessagingClientProtocol(Protocol):
         print("Client connected to server\n")
         self.transport = transport
 
-    def data_received(self, data):
+    def data_received(self, data):                      ##Evaluating which packet is recieved and responding accordingly
         self._deserializer = PacketType.Deserializer()
         self._deserializer.update(data)
         for pckt in self._deserializer.nextPackets():
@@ -57,8 +53,8 @@ class MessagingClientProtocol(Protocol):
                 print("Got packet 2")
                 print("Packet Details: Only request was transfered for this packet\n")
                 respondPacket = SendReceiverInfo()
-                respondPacket.receiverID = "jchahal_R"
-                respondPacket.message = b"This is a test Message"
+                respondPacket.receiverID = self._receiver_id
+                respondPacket.message = self._msg
             elif isinstance(pckt, MessageSent):
                 print("Got Packet 4")
                 print("Packet Details: MessageSentTime: " + pckt.messageSentTime + "\n")
@@ -67,8 +63,11 @@ class MessagingClientProtocol(Protocol):
 
             self.transport.write(respondPacket.__serialize__())
 
-    def start_communication(self):
-        initialPacket = RequestWriteMessage(clientID = "jchahal1_S")
+    def start_communication(self, client_id, receiver_id, msg): ##Sending the first pacekt and setting the variable values
+        self._client_id = client_id
+        self._receiver_id = receiver_id
+        self._msg = msg
+        initialPacket = RequestWriteMessage(clientID = self._client_id)
         self.transport.write(initialPacket.__serialize__())
         
     def connection_lost(self, reason=None):
@@ -95,7 +94,7 @@ class MessagingServerProtocol (Protocol):
             elif isinstance(pckt, SendReceiverInfo):
                 print("Got Packet 3")
                 print("Packet Details: ReceiverID: " + pckt.receiverID)
-                print("Message" + str(pckt.message) +"\n")
+                print("Message: " + str(pckt.message) +"\n")
                 respondPacket = MessageSent()
                 respondPacket.messageSentTime = str(datetime.datetime.now())
 
@@ -114,8 +113,7 @@ def BasicUnitTest():
     server.connection_made(transportToClient)
     client.connection_made(transportToServer)
 
-    client.start_communication()
-    
-    
+    client.start_communication("jchahal1_S", "jchahal1_R", b'This is a test message')
+   
 if __name__ == "__main__":
     BasicUnitTest()
