@@ -89,10 +89,10 @@ class MessagingClientProtocol(Protocol):
 
             self.transport.write(respondPacket.__serialize__())
 
-    def start_communication(self): ##Sending the first pacekt and setting the variable values
+    def start_communication(self, _id): ##Sending the first pacekt and setting the variable values
         self._receiver_id = "jchahal1_R"
         self._msg = b'This is a test Message'
-        initialPacket = RequestWriteMessage(clientID = "jchahal1_S")
+        initialPacket = RequestWriteMessage(clientID = _id)
         self.transport.write(initialPacket.__serialize__())
         
     def connection_lost(self, reason=None):
