@@ -79,7 +79,6 @@ class MessagingClientProtocol(Protocol):
             print(pckt)
             if isinstance(pckt, RequestReceiverInfo):
                 print("Got packet 2")
-                print("Packet Details: Only request was transfered for this packet\n")
                 respondPacket = SendReceiverInfo()
                 respondPacket.receiverID = self._receiver_id
                 respondPacket.message = self._msg
