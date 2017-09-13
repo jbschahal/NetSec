@@ -63,7 +63,7 @@ class MessagingServerProtocol (Protocol):
         print("Comminication Ended")
 
 class MessagingClientProtocol(Protocol):
-    def __init__(self):
+    def __init__(self, callback=None):
         self.buffer = ""
         if callback:
             self.callback = callback
