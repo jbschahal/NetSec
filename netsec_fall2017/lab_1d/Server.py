@@ -45,7 +45,6 @@ class MessagingServerProtocol (Protocol):
         self.transport = transport
 
     def data_received(self, data):
-        print("d_r of server")
         self._deserializer = PacketType.Deserializer()
         self._deserializer.update(data)
         for pckt in self._deserializer.nextPackets():
@@ -81,7 +80,6 @@ class MessagingClientProtocol(Protocol):
         return MessagingClientProtocol(self.callback)
 
     def data_received(self, data):      ##Evaluating which packet is recieved and responding accordingly
-        print("d_r of client")
         self._deserializer = PacketType.Deserializer()
         self._deserializer.update(data)
         for pckt in self._deserializer.nextPackets():
