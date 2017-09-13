@@ -64,20 +64,12 @@ class MessagingServerProtocol (Protocol):
         print("Comminication Ended")
 
 class MessagingClientProtocol(Protocol):
-    def __init__(self, callback=None):
-        self.buffer = ""
-        if callback:
-            self.callback = callback
-        else:
-            self.callback = print
+    def __init__(self):
         transport = None
     
     def connection_made(self, transport):
         print("Client connected to server\n")
         self.transport = transport
-
-    def buildProtocol(self):
-        return MessagingClientProtocol(self.callback)
 
     def data_received(self, data):      ##Evaluating which packet is recieved and responding accordingly
         self._deserializer = PacketType.Deserializer()
