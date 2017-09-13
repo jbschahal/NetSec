@@ -107,8 +107,11 @@ def BasicUnitTest():
     client = MessagingClientProtocol()
     server = MessagingServerProtocol()
     
-    transportToServer = mock.MockTransportToProtocol(server)
-    transportToClient = mock.MockTransportToProtocol(client)
+    transportToServer = mock.MockTransportToProtocol(myProtocol=client)
+    transportToClient = mock.MockTransportToProtocol(myProtocol=server)
+
+    transportToServer.setRemoteTransport(transportToClient)
+    transportToClient.setRemoteTransport(transportToServer)
 
     server.connection_made(transportToClient)
     client.connection_made(transportToServer)
