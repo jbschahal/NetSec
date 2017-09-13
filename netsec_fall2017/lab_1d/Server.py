@@ -48,7 +48,6 @@ class MessagingServerProtocol (Protocol):
         self._deserializer = PacketType.Deserializer()
         self._deserializer.update(data)
         for pckt in self._deserializer.nextPackets():
-            print("Got a Packet from Client and the packet is ")
             print(pckt)
             if isinstance(pckt, RequestWriteMessage):
                 print("Got Packet 1")
@@ -65,6 +64,11 @@ class MessagingServerProtocol (Protocol):
 
 class MessagingClientProtocol(Protocol):
     def __init__(self):
+        self.buffer = ""
+        if callback:
+            self.callback = callback
+        else:
+            self.callback = print
         transport = None
     
     def connection_made(self, transport):
@@ -75,7 +79,6 @@ class MessagingClientProtocol(Protocol):
         self._deserializer = PacketType.Deserializer()
         self._deserializer.update(data)
         for pckt in self._deserializer.nextPackets():
-            print("Got a Packet from Server and the packet is ")
             print(pckt)
             if isinstance(pckt, RequestReceiverInfo):
                 print("Got packet 2")
@@ -97,6 +100,28 @@ class MessagingClientProtocol(Protocol):
         
     def connection_lost(self, reason=None):
         print("Comminication Ended\n")
+
+class EchoControl:
+    def __init__(self):
+        self.txProtocol = None
+        
+    def buildProtocol(self):
+        return MessagingClientProtocol(self.callback)
+        
+    def connect(self, txProtocol):
+        self.txProtocol = txProtocol
+        print("Connection to Server Established!")
+        self.txProtocol = txProtocol
+        print("Enter Message: ", end="")
+        
+    def callback(self, message):
+        print("Server Response: {}".format(message))
+        
+    def stdinAlert(self):
+        data = sys.stdin.readline()
+        if data and data[-1] == "\n":
+            data = data[:-1] # strip off \n
+        self.txProtocol.start_communication(data)
     
 if __name__ == "__main__":
     
