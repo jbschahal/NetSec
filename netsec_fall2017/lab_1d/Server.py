@@ -6,6 +6,7 @@ from asyncio import Protocol
 import asyncio
 import datetime
 import playground
+import sys
 
 class RequestWriteMessage(PacketType):                  ##Packet1: Client requesting the server to send the message
     DEFINITION_IDENTIFIER = "lab1.packet1"
@@ -48,12 +49,16 @@ class MessagingServerProtocol (Protocol):
         self._deserializer = PacketType.Deserializer()
         self._deserializer.update(data)
         for pckt in self._deserializer.nextPackets():
-            print(pckt)
             if isinstance(pckt, RequestWriteMessage):
                 print("Got Packet 1")
+                print(pckt)
+                print("Packet Details: ClientID: " + pckt.clientID +"\n")
                 respondPacket = RequestReceiverInfo()
             elif isinstance(pckt, SendReceiverInfo):
                 print("Got Packet 3")
+                print(pckt)
+                print("Packet Details: ReceiverID: " + pckt.receiverID)
+                print("Message: " + str(pckt.message) +"\n")
                 respondPacket = MessageSent()
                 respondPacket.messageSentTime = str(datetime.datetime.now())
 
@@ -63,12 +68,7 @@ class MessagingServerProtocol (Protocol):
         print("Comminication Ended")
 
 class MessagingClientProtocol(Protocol):
-    def __init__(self, callback=None):
-        self.buffer = ""
-        if callback:
-            self.callback = callback
-        else:
-            self.callback = print
+    def __init__(self):
         transport = None
     
     def connection_made(self, transport):
@@ -82,11 +82,15 @@ class MessagingClientProtocol(Protocol):
             print(pckt)
             if isinstance(pckt, RequestReceiverInfo):
                 print("Got packet 2")
+                print(pckt)
+                print("Packet Details: Only request was transfered for this packet\n")
                 respondPacket = SendReceiverInfo()
                 respondPacket.receiverID = self._receiver_id
                 respondPacket.message = self._msg
             elif isinstance(pckt, MessageSent):
                 print("Got Packet 4")
+                print(pckt)
+                print("Packet Details: MessageSentTime: " + pckt.messageSentTime + "\n")
                 self.connection_lost()
                 return
 
@@ -101,21 +105,17 @@ class MessagingClientProtocol(Protocol):
     def connection_lost(self, reason=None):
         print("Comminication Ended\n")
 
-class EchoControl:
+class ClientControl:
     def __init__(self):
         self.txProtocol = None
         
     def buildProtocol(self):
-        return MessagingClientProtocol(self.callback)
+        return MessagingClientProtocol()
         
     def connect(self, txProtocol):
         self.txProtocol = txProtocol
         print("Connection to Server Established!")
-        self.txProtocol = txProtocol
-        print("Enter Message: ", end="")
-        
-    def callback(self, message):
-        print("Server Response: {}".format(message))
+        print("Enter clientID: ")
         
     def stdinAlert(self):
         data = sys.stdin.readline()
