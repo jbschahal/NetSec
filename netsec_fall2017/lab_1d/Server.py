@@ -48,7 +48,6 @@ class MessagingServerProtocol (Protocol):
         self._deserializer = PacketType.Deserializer()
         self._deserializer.update(data)
         for pckt in self._deserializer.nextPackets():
-            print("Got a Packet from Client and the packet is ")
             print(pckt)
             if isinstance(pckt, RequestWriteMessage):
                 print("Got Packet 1")
@@ -75,7 +74,6 @@ class MessagingClientProtocol(Protocol):
         self._deserializer = PacketType.Deserializer()
         self._deserializer.update(data)
         for pckt in self._deserializer.nextPackets():
-            print("Got a Packet from Server and the packet is ")
             print(pckt)
             if isinstance(pckt, RequestReceiverInfo):
                 print("Got packet 2")
@@ -97,12 +95,13 @@ class MessagingClientProtocol(Protocol):
         
     def connection_lost(self, reason=None):
         print("Comminication Ended\n")
+
     
 if __name__ == "__main__":
     
     loop = asyncio.get_event_loop()
-    coro = playground.getConnector().create_playground_server(lambda: MessagingServerProtocol(), 8000)
+    coro = loop.create_server(lambda: MessagingServerProtocol(), port=8000)
     server = loop.run_until_complete(coro)
-    print("Echo Server Started at {}".format(server.sockets[0].gethostname()))
+    print("Echo Server Started at {}".format(server.sockets[0]))
     loop.run_forever()
     loop.close()
