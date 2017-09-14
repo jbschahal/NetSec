@@ -48,12 +48,16 @@ class MessagingServerProtocol (Protocol):
         self._deserializer = PacketType.Deserializer()
         self._deserializer.update(data)
         for pckt in self._deserializer.nextPackets():
-            print(pckt)
             if isinstance(pckt, RequestWriteMessage):
                 print("Got Packet 1")
+                print(pckt)
+                print("Packet Details: ClientID: " + pckt.clientID +"\n")
                 respondPacket = RequestReceiverInfo()
             elif isinstance(pckt, SendReceiverInfo):
                 print("Got Packet 3")
+                print(pckt)
+                print("Packet Details: ReceiverID: " + pckt.receiverID)
+                print("Message: " + str(pckt.message) +"\n")
                 respondPacket = MessageSent()
                 respondPacket.messageSentTime = str(datetime.datetime.now())
 
@@ -74,14 +78,17 @@ class MessagingClientProtocol(Protocol):
         self._deserializer = PacketType.Deserializer()
         self._deserializer.update(data)
         for pckt in self._deserializer.nextPackets():
-            print(pckt)
             if isinstance(pckt, RequestReceiverInfo):
                 print("Got packet 2")
+                print(pckt)
+                print("Packet Details: Only request was transfered for this packet\n")
                 respondPacket = SendReceiverInfo()
                 respondPacket.receiverID = self._receiver_id
                 respondPacket.message = self._msg
             elif isinstance(pckt, MessageSent):
                 print("Got Packet 4")
+                print(pckt)
+                print("Packet Details: MessageSentTime: " + pckt.messageSentTime + "\n")
                 self.connection_lost()
                 return
 
