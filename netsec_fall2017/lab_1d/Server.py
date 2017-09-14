@@ -102,6 +102,6 @@ if __name__ == "__main__":
     loop = asyncio.get_event_loop()
     coro = loop.create_server(lambda: MessagingServerProtocol(), port=8000)
     server = loop.run_until_complete(coro)
-    print("Echo Server Started at {}".format(server.sockets[0]))
+    print("Echo Server Started")
     loop.run_forever()
     loop.close()
