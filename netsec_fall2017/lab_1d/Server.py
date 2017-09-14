@@ -97,7 +97,7 @@ class MessagingClientProtocol(Protocol):
             self.transport.write(respondPacket.__serialize__())
 
     def start_communication(self, _id): ##Sending the first pacekt and setting the variable values
-        self._receiver_id = "jchahal1_R"
+        self._receiver_id = "r_ID"
         self._msg = b'This is a test Message'
         initialPacket = RequestWriteMessage(clientID = _id)
         self.transport.write(initialPacket.__serialize__())
