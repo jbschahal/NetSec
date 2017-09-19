@@ -7,6 +7,7 @@ from asyncio import Protocol
 import asyncio
 import datetime
 import sys
+import logging
 
 class RequestWriteMessage(PacketType):                  ##Packet1: Client requesting the server to send the message
     DEFINITION_IDENTIFIER = "lab1.packet1"
@@ -51,15 +52,15 @@ class MessagingServerProtocol (Protocol):
         self._deserializer.update(data)
         for pckt in self._deserializer.nextPackets():
             if isinstance(pckt, RequestWriteMessage):
-                print("Got Packet 1")
+                print("\n\nGot Packet 1")
                 print(pckt)
-                print("Packet Details: ClientID: " + pckt.clientID +"\n")
+                print("Packet Details: ClientID: " + pckt.clientID +"\n\n")
                 respondPacket = RequestReceiverInfo()
             elif isinstance(pckt, SendReceiverInfo):
-                print("Got Packet 3")
+                print("\n\nGot Packet 3")
                 print(pckt)
                 print("Packet Details: ReceiverID: " + pckt.receiverID)
-                print("Message: " + str(pckt.message) +"\n")
+                print("Message: " + str(pckt.message) +"\n\n")
                 respondPacket = MessageSent()
                 respondPacket.messageSentTime = str(datetime.datetime.now())
 
@@ -77,28 +78,28 @@ class MessagingClientProtocol(Protocol):
         print("Client connected to server\n")
         self.transport = transport
 
-    def data_received(self, data):      ##Evaluating which packet is recieved and responding accordingly
+    def data_received(self, data):                      ##Evaluating which packet is recieved and responding accordingly
         self._deserializer = PacketType.Deserializer()
         self._deserializer.update(data)
         for pckt in self._deserializer.nextPackets():
             print(pckt)
             if isinstance(pckt, RequestReceiverInfo):
-                print("Got packet 2")
+                print("\n\nGot packet 2")
                 print(pckt)
-                print("Packet Details: Only request was transfered for this packet\n")
+                print("Packet Details: Only request was transfered for this packet\n\n")
                 respondPacket = SendReceiverInfo()
                 respondPacket.receiverID = self._receiver_id
                 respondPacket.message = self._msg
             elif isinstance(pckt, MessageSent):
-                print("Got Packet 4")
+                print("\n\nGot Packet 4")
                 print(pckt)
-                print("Packet Details: MessageSentTime: " + pckt.messageSentTime + "\n")
+                print("Packet Details: MessageSentTime: " + pckt.messageSentTime + "\n\n")
                 self.connection_lost()
                 return
 
             self.transport.write(respondPacket.__serialize__())
 
-    def start_communication(self, _id): ##Sending the first pacekt and setting the variable values
+    def start_communication(self, _id):                 ##Sending the first pacekt and setting the variable values
         self._receiver_id = "r_ID"
         self._msg = b'This is a test Message'
         initialPacket = RequestWriteMessage(clientID = _id)
@@ -115,7 +116,7 @@ class PassthroughLayerOne(StackingProtocol):
 
     def connection_made(self, transport):
         self.transport = transport
-        print("Connection Mande to passthrough 1")
+        print("\nConnection Mande to passthrough 1\n")
         self.higherProtocol().connection_made(StackingTransport(transport))
 
     def data_received(self, data):
@@ -128,7 +129,7 @@ class PassthroughLayerTwo(StackingProtocol):
 
     def connection_made(self, transport):
         self.transport = transport
-        print("Connection Made to passthrough 2")
+        print("\nConnection Made to passthrough 2\n")
         self.higherProtocol().connection_made(StackingTransport(transport))
 
     def data_received(self, data):
@@ -144,7 +145,7 @@ class ClientControl:
         
     def connect(self, txProtocol):
         self.txProtocol = txProtocol
-        print("Connection to Server Established!")
+        print("\n\nConnection to Server Established!")
         print("Enter clientID: ")
         
     def stdinAlert(self):
@@ -158,14 +159,21 @@ class ClientControl:
     
 if __name__ == "__main__":
 
+    logging.getLogger().setLevel(logging.NOTSET)
+    logging.getLogger().addHandler(logging.StreamHandler())
+
     f = StackingProtocolFactory(lambda: PassthroughLayerOne(), lambda: PassthroughLayerTwo())
     ptConnector = playground.Connector(protocolStack=f)
     playground.setConnector("passthrough", ptConnector)
     
     loop = asyncio.get_event_loop()
+    loop.set_debug(enabled=True)
     coro = playground.getConnector("passthrough").create_playground_server(lambda: MessagingServerProtocol(), 8000)
     server = loop.run_until_complete(coro)
-    print("Echo Server Started at {}".format(server.sockets[0].gethostname()))
+    print("Server Started at {}\n".format(server.sockets[0].gethostname()))
+
+
+
     loop.run_forever()
     loop.close()
 
