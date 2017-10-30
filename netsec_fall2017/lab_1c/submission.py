@@ -118,5 +118,6 @@ def BasicUnitTest():
 
     client.start_communication("jchahal1_S", "jchahal1_R", b'This is a test message')
    
+#Main
 if __name__ == "__main__":
     BasicUnitTest()
